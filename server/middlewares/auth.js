@@ -1,6 +1,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const multer = require('multer');
 
 async function jwtVerify(req, res, next) {
     
@@ -25,9 +26,8 @@ async function jwtVerify(req, res, next) {
 
 }
 
-async function isAdmin (req,res,next){
+function isAdmin (req,res,next){
     try {
-        console.log(req.user);
         if(req.user && req.user.role === 'admin'){
             next();
             return;
@@ -38,4 +38,19 @@ async function isAdmin (req,res,next){
     }
 }
 
-module.exports = { jwtVerify,isAdmin }
+function isAdminOrOwner (req,res,next){
+    try {
+        if(req.user.role && (req.user.role === 'admin' || req.user.role === 'owner' ))
+        {
+            next();
+            return; 
+        }
+        res.status(404).json("Disallowed Access")
+    } catch (err) {
+        res.status(500).json(err.message);
+    }
+}
+
+
+
+module.exports = { jwtVerify,isAdmin,isAdminOrOwner }

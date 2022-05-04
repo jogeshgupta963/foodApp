@@ -10,6 +10,8 @@ const connect = require('./database/connect')
 //routers
 const user = require('./routes/user');
 const plan = require('./routes/plan')
+const review = require('./routes/review')
+const booking = require('./routes/booking')
 
 const app =express();
 
@@ -20,6 +22,8 @@ app.use(express.json());
 //routes
 app.use('/user',user);
 app.use('/plan',plan);
+app.use('/review',review);
+app.use('/booking',booking);
 
 
 (async function(){

@@ -1,6 +1,7 @@
 const User  = require('../models/User')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer')
 
 require('dotenv').config()
 
@@ -131,7 +132,7 @@ async function login(req,res){
 }
 
 //@route /forgotPassword
-//@desc POST to reset  a user pass
+//@desc GET to reset  a user pass
 //@access public
 
 async function forgetPassword(req,res){
@@ -141,11 +142,25 @@ async function forgetPassword(req,res){
         if(!user) return res.json("user not found");
 
         const resetToken = user.createResetToken();
-        let resetPasswordLink = `${req.protocol}://${req.get('host')}/resetPassword/${resetToken}` 
+        let resetPasswordLink = `${req.protocol}://${req.get('host')}/user/resetPassword/${resetToken}` 
 
         //send email
+        let gmailPass = process.env.gmailPass
 
-
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'jogeshgupta963@gmail.com',
+                pass: gmailPass
+            }
+        });
+        let info = transporter.sendMail({
+            from: '"Reset Paswword👻" <jogeshgupta963@gmail.com>',
+            to: user.email,
+            subject: `Password reset for ${user.name} .`,
+            html: `<b>Click here to reset ur password ${resetPasswordLink} </b>`,
+        });
+        res.status(200).json("rest link sent")
 
     } catch (err) {
         res.status(500).json(err.message);
@@ -161,8 +176,10 @@ async function resetPassword(req,res){
         const {token} =req.params;
         const user = await User.findOne({resetToken:token})
 
-        //update password in dp
-        user.resetPasswordHandler(password,confirmPassword);
+        //update password in db
+        // user.resetPasswordHandler(req.body.password);
+        user.password = req.body.password
+        user.resetToken = undefined;
 
         user.save();
         res.status(200).json("password changed successfully");

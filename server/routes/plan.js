@@ -1,16 +1,31 @@
 const express = require('express');
 
 
-const { createPlan } = require('../controllers/plan');
-const {jwtVerify,isAdmin} = require('../middlewares/auth')
+const {getAllPlans,getPlan,createPlan,updatePlan,deletePlan} = require('../controllers/plan')
+
+const {jwtVerify,isAdminOrOwner} = require('../middlewares/auth')
 
 const router = express.Router();
 
 
+router.route('/allPlans')
+.get(getAllPlans)
+
+//user specific
+router
+.route('/myPlans/:id')
+.get(jwtVerify,getPlan)
+
+
 //admin specific routes
 router
-.route('/')
-.post(jwtVerify,isAdmin,createPlan)
+.route('/plans')
+.post(jwtVerify,isAdminOrOwner,createPlan)
+
+router.route('/plans/:id')
+.put(jwtVerify,isAdminOrOwner,updatePlan)
+.delete(jwtVerify,isAdminOrOwner,deletePlan)
 
 
-module.exports = router;
+
+module.exports = router; 

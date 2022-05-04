@@ -41,7 +41,7 @@ userSchema.methods.createResetToken = ()=>{
     return token;
 }
 
-userSchema.methods.resetPasswordHandler = (password,confirmPassword)=>{
+userSchema.methods.resetPasswordHandler = (password)=>{
     this.password = password;
     this.resetToken = undefined;
 }

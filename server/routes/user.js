@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
-
+const multer = require('multer')
 const {updateUser,deleteUser,getAllUser,signup,login,getUser,forgetPassword,resetPassword,logout} = require('../controllers/user')
 
 const {jwtVerify,isAdmin} = require('../middlewares/auth')
+const upload = require('../middlewares/upload')
 
-//signup
+
 router
 .route('/signup')
-.post(signup)
+.post( upload.single('profileImage') ,signup)
 
 //login
 router
@@ -33,13 +34,13 @@ router
 
 //forgot password
 router
-.route('forgotPassword')
+.route('/forgotPassword')
 .post(forgetPassword)
 
 
 // reset password
 router
-.route("/resetPassord/:token")
+.route("/resetPassword/:token")
 .post(resetPassword)
 
 
